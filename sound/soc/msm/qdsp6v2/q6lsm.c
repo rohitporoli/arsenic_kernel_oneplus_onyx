@@ -255,6 +255,7 @@ void q6lsm_client_free(struct lsm_client *client)
 	q6lsm_mmap_apr_dereg();
 	mutex_destroy(&client->cmd_lock);
 	kfree(client);
+	client = NULL;
 }
 
 /*
@@ -511,7 +512,7 @@ static int q6lsm_memory_map_regions(struct lsm_client *client,
 	int rc;
 	int cmd_size = 0;
 
-	pr_debug("%s: dma_addr_p 0x%pa, dma_buf_sz %d, mmap_p 0x%p, session %d\n",
+	pr_debug("%s: dma_addr_p 0x%pa, dma_buf_sz %d, mmap_p 0x%pK, session %d\n",
 		__func__, &dma_addr_p, dma_buf_sz, mmap_p,
 		client->session);
 	if (CHECK_SESSION(client->session))

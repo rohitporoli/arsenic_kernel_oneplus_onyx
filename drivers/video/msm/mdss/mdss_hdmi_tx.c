@@ -903,7 +903,7 @@ static int hdmi_tx_sysfs_create(struct hdmi_tx_ctrl *hdmi_ctrl,
 		return rc;
 	}
 	hdmi_ctrl->kobj = &fbi->dev->kobj;
-	DEV_DBG("%s: sysfs group %p\n", __func__, hdmi_ctrl->kobj);
+	DEV_DBG("%s: sysfs group %pK\n", __func__, hdmi_ctrl->kobj);
 
 	return 0;
 } /* hdmi_tx_sysfs_create */
@@ -2357,8 +2357,8 @@ static int hdmi_tx_get_audio_edid_blk(struct platform_device *pdev,
 	}
 
 	if (!hdmi_ctrl->audio_sdev.state) {
-		DEV_ERR("%s: failed. HDMI is not connected/ready for audio\n",
-			__func__);
+		//DEV_ERR("%s: failed. HDMI is not connected/ready for audio\n",
+		//	__func__);
 		return -EPERM;
 	}
 

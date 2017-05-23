@@ -824,9 +824,8 @@ void disassociate_ctty(int on_exit)
 	spin_lock_irq(&current->sighand->siglock);
 	put_pid(current->signal->tty_old_pgrp);
 	current->signal->tty_old_pgrp = NULL;
-	spin_unlock_irq(&current->sighand->siglock);
 
-	tty = get_current_tty();
+	tty = tty_kref_get(current->signal->tty);
 	if (tty) {
 		unsigned long flags;
 		spin_lock_irqsave(&tty->ctrl_lock, flags);
@@ -843,6 +842,7 @@ void disassociate_ctty(int on_exit)
 #endif
 	}
 
+	spin_unlock_irq(&current->sighand->siglock);
 	/* Now clear signal->tty under the lock */
 	read_lock(&tasklist_lock);
 	session_clear_tty(task_session(current));
@@ -1623,6 +1623,7 @@ int tty_release(struct inode *inode, struct file *filp)
 	int	devpts;
 	int	idx;
 	char	buf[64];
+	long	timeout = 0;
 
 	if (tty_paranoia_check(tty, inode, __func__))
 		return 0;
@@ -1707,7 +1708,11 @@ int tty_release(struct inode *inode, struct file *filp)
 				__func__, tty_name(tty, buf));
 		tty_unlock();
 		mutex_unlock(&tty_mutex);
-		schedule();
+		schedule_timeout_killable(timeout);
+		if (timeout < 120 * HZ)
+			timeout = 2 * timeout + 1;
+		else
+			timeout = MAX_SCHEDULE_TIMEOUT;
 	}
 
 	/*

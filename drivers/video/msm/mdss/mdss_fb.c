@@ -1420,7 +1420,7 @@ int mdss_fb_alloc_fb_ion_memory(struct msm_fb_data_type *mfd, size_t fb_size)
 		goto fb_mmap_failed;
 	}
 
-	pr_debug("alloc 0x%zuB vaddr = %p (%pa iova) for fb%d\n", fb_size,
+	pr_debug("alloc 0x%zuB vaddr = %pK (%pa iova) for fb%d\n", fb_size,
 			vaddr, &mfd->iova, mfd->index);
 
 	mfd->fbi->screen_base = (char *) vaddr;
@@ -1513,7 +1513,7 @@ static int mdss_fb_fbmem_ion_mmap(struct fb_info *info,
 				vma->vm_page_prot =
 					pgprot_writecombine(vma->vm_page_prot);
 
-			pr_debug("vma=%p, addr=%x len=%ld",
+			pr_debug("vma=%pK, addr=%x len=%ld",
 					vma, (unsigned int)addr, len);
 			pr_cont("vm_start=%x vm_end=%x vm_page_prot=%ld\n",
 					(unsigned int)vma->vm_start,
@@ -1944,8 +1944,9 @@ static int mdss_fb_open(struct fb_info *info, int user)
 	struct task_struct *task = current->group_leader;
 
 	if (mfd->shutdown_pending) {
-		pr_err("Shutdown pending. Aborting operation. Request from pid:%d name=%s\n",
-				pid, task->comm);
+		pr_err_once("Shutdown pending. Aborting operation. Request from pid:%d name=%s\n",
+			pid, task->comm);
+		sysfs_notify(&mfd->fbi->dev->kobj, NULL, "show_blank_event");
 		return -EPERM;
 	}
 
@@ -2023,8 +2024,8 @@ static int mdss_fb_release_all(struct fb_info *info, bool release_all)
 	struct task_struct *task = current->group_leader;
 
 	if (!mfd->ref_cnt) {
-		pr_info("try to close unopened fb %d! from %s\n", mfd->index,
-			task->comm);
+		pr_info("try to close unopened fb %d! from pid:%d name:%s\n",
+			mfd->index, pid, task->comm);
 		return -EINVAL;
 	}
 

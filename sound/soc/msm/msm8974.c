@@ -1991,14 +1991,14 @@ void *def_taiko_mbhc_cal(void)
 	btn_low[2] = 73;
 	btn_high[2] = 104;
 	btn_low[3] = 105;
-	btn_high[3] = 255;
-	btn_low[4] = 256;
-	btn_high[4] = 257;
-	btn_low[5] = 258;
-	btn_high[5] = 259;
-	btn_low[6] = 260;
-	btn_high[6] = 261;
-	btn_low[7] = 262;
+	btn_high[3] = 290;
+	btn_low[4] = 291;
+	btn_high[4] = 292;
+	btn_low[5] = 293;
+	btn_high[5] = 294;
+	btn_low[6] = 295;
+	btn_high[6] = 296;
+	btn_low[7] = 297;
 	btn_high[7] = 595;
 #else
     btn_low[0] = -50;
@@ -2185,7 +2185,7 @@ static int msm8974_mi2s_startup(struct snd_pcm_substream *substream)
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	//struct snd_soc_dai *codec_dai = rtd->codec_dai;
 
-	pr_info("%s: dai name %s %p\n", __func__, cpu_dai->name, cpu_dai->dev);
+	pr_info("%s: dai name %s %pK\n", __func__, cpu_dai->name, cpu_dai->dev);
 
 	if (atomic_inc_return(&sec_mi2s_clk.mi2s_rsc_ref) == 1) {
 		pr_info("%s: acquire mi2s resources\n", __func__);
